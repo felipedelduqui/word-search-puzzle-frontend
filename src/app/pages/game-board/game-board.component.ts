@@ -1,7 +1,7 @@
-import { Component, OnInit, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, signal, computed, effect, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PuzzleService } from './core/services/puzzle';
-import { Difficulty, TopicItem } from './core/models/puzzle.model';
+import { PuzzleService } from '../../core/services/puzzle';
+import { Difficulty, TopicItem } from '../../core/models/puzzle.model';
 
 interface CellCoords {
   row: number;
@@ -9,22 +9,19 @@ interface CellCoords {
 }
 
 @Component({
-  selector: 'app-root',
+  selector: 'app-game-board',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './app.html',
-  styleUrl: './app.scss',
+  templateUrl: './game-board.html',
+  styleUrl: './game-board.scss',
 })
-export class App implements OnInit {
-  // Application State State Management via Signals
+export class GameBoardComponent implements OnInit {
+  // Application State Management via Signals
   protected readonly title = signal('Word Search Puzzle');
   protected readonly topics = signal<TopicItem[]>([
-    { id: 'pokemon', name: 'Pokémon',
-      imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/pokemon_card.PNG' },
-    { id: 'friends', name: 'Friends',
-      imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/friends_card.PNG' },
-    { id: 'animals', name: 'Animals',
-      imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG' },
+    { id: 'pokemon', name: 'Pokémon', imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/pokemon_card.PNG?t=123456789' },
+    { id: 'friends', name: 'Friends', imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/friends_card.PNG?t=123456789' },
+    { id: 'animals', name: 'Animals', imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
   ]);
 
   protected readonly selectedTopic = signal<string>('pokemon');
@@ -40,6 +37,10 @@ export class App implements OnInit {
   protected readonly selectionStart = signal<CellCoords | null>(null);
   protected readonly selectionCurrent = signal<CellCoords | null>(null);
 
+  // Audio assets instances for word success and ultimate match victory
+  private readonly successAudio = new Audio('/audio/mixkit-electronic-lock-success-beeps-2852.wav');
+  private readonly victoryAudio = new Audio('/audio/mixkit-fantasy-game-success-notification-270.wav');
+
   // Computes the words remaining to find dynamically
   protected readonly remainingCount = computed(() => {
     return this.targetWords().length - this.foundWords().size;
@@ -53,6 +54,17 @@ export class App implements OnInit {
   }
 
   ngOnInit(): void {}
+
+  /**
+   * Captures the global mouseup interaction across the entire window view frame
+   * to guarantee code resolution and evaluate items even if dropped outside containers.
+   */
+  @HostListener('window:mouseup')
+  protected onMouseUp(): void {
+    if (!this.isSelecting()) return;
+    this.evaluateCurrentSelection();
+    this.clearSelection();
+  }
 
   protected loadNewPuzzle(topic: string, difficulty: Difficulty): void {
     this.puzzleService.generatePuzzle(topic, difficulty).subscribe({
@@ -86,14 +98,6 @@ export class App implements OnInit {
   protected onCellMouseEnter(row: number, col: number): void {
     if (!this.isSelecting()) return;
     this.selectionCurrent.set({ row, col });
-  }
-
-  protected onMouseUp(): void {
-    if (!this.isSelecting()) return;
-    this.evaluateCurrentSelection();
-    this.isSelecting.set(false);
-    this.selectionStart.set(null);
-    this.selectionCurrent.set(null);
   }
 
   private clearSelection(): void {
@@ -142,6 +146,89 @@ export class App implements OnInit {
     const updatedSet = new Set(this.foundWords());
     updatedSet.add(word);
     this.foundWords.set(updatedSet);
+    
+    // Evaluate if the game is completely finished or just a regular single word find
+    if (this.remainingCount() === 0) {
+      this.playVictorySound();
+    } else {
+      this.playSuccessSound();
+    }
+  }
+
+  /**
+   * Triggers sound audio feedback immediately with resets to allow consecutive plays
+   */
+  private playSuccessSound(): void {
+    this.successAudio.currentTime = 0;
+    this.successAudio.play().catch(err => console.warn('Audio playback blocked by browser policies:', err));
+  }
+
+  /**
+   * Triggers the grand game completion fanfare sound effect
+   */
+  private playVictorySound(): void {
+    this.victoryAudio.currentTime = 0;
+    this.victoryAudio.play().catch(err => console.warn('Audio playback blocked by browser policies:', err));
+  }
+
+  /**
+   * Evaluates if a static coordinate cell matches any found words trajectory paths permanently
+   */
+  protected isCellPermanentlyFound(row: number, col: number): boolean {
+    const words = this.targetWords();
+    const confirmedSet = this.foundWords();
+    if (confirmedSet.size === 0) return false;
+
+    for (const word of words) {
+      if (confirmedSet.has(word)) {
+        if (this.checkWordGridPresence(word, row, col)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Back-checking scanning engine to match word characters sequence maps to persistent cells positions
+   */
+  private checkWordGridPresence(word: string, targetRow: number, targetCol: number): boolean {
+    const matrix = this.grid();
+    const rowsCount = matrix.length;
+    const colsCount = matrix[0]?.length || 0;
+    const wordLen = word.length;
+
+    const directions = [
+      { r: 0, c: 1 },  { r: 0, c: -1 },
+      { r: 1, c: 0 },  { r: -1, c: 0 },
+      { r: 1, c: 1 },  { r: -1, c: -1 },
+      { r: 1, c: -1 }, { r: -1, c: 1 }
+    ];
+
+    for (let r = 0; r < rowsCount; r++) {
+      for (let c = 0; c < colsCount; c++) {
+        for (const dir of directions) {
+          let k;
+          let match = true;
+          for (k = 0; k < wordLen; k++) {
+            const nextR = r + dir.r * k;
+            const nextC = c + dir.c * k;
+            if (nextR < 0 || nextR >= rowsCount || nextC < 0 || nextC >= colsCount || matrix[nextR][nextC] !== word[k]) {
+              match = false;
+              break;
+            }
+          }
+          if (match) {
+            for (let i = 0; i < wordLen; i++) {
+              if (r + dir.r * i === targetRow && c + dir.c * i === targetCol) {
+                return true;
+              }
+            }
+          }
+        }
+      }
+    }
+    return false;
   }
 
   /**
@@ -157,7 +244,6 @@ export class App implements OnInit {
     const minC = Math.min(start.col, end.col);
     const maxC = Math.max(start.col, end.col);
 
-    // Validates alignment layout conditions: vertical, horizontal, or perfect diagonal lines
     const isHorizontal = start.row === end.row;
     const isVertical = start.col === end.col;
     const isDiagonal = Math.abs(start.row - end.row) === Math.abs(start.col - end.col);
@@ -167,7 +253,6 @@ export class App implements OnInit {
     if (isHorizontal) return row === start.row && col >= minC && col <= maxC;
     if (isVertical) return col === start.col && row >= minR && row <= maxR;
     
-    // Diagonal slope track computation verification
     const belongsToBox = row >= minR && row <= maxR && col >= minC && col <= maxC;
     if (belongsToBox) {
       return Math.abs(row - start.row) === Math.abs(col - start.col);

@@ -1,1 +1,85 @@
-<p>game-board works!</p>
+<aside class="workspace-sidebar-left">
+  <h2>Select Topic</h2>
+  <div class="topics-feed">
+    
+    @for (topic of topics(); track topic.id) {
+      <div class="topic-card" 
+          [class.active]="selectedTopic() === topic.id"
+          (click)="selectTopic(topic.id)">
+        <div class="card-image-wrapper">
+          <img #imgRef 
+              [src]="topic.imageUrl" 
+              [alt]="topic.name"
+              (error)="imgRef.src = 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG'" />
+        </div>
+        <div class="card-info">
+          <h3>{{ topic.name }}</h3>
+        </div>
+      </div>
+    }
+    
+  </div>
+</aside>
+
+<section class="workspace-arena">
+  <div class="arena-controls-bar">
+    <div class="control-dropdown-group">
+      <label [attr.for]="'difficulty-selector'">Difficulty Level:</label>
+      <select id="difficulty-selector" [value]="selectedDifficulty()" (change)="changeDifficulty($event)">
+        <option value="EASY">Easy (Orthogonal)</option>
+        <option value="MEDIUM">Medium (Bidirectional)</option>
+        <option value="HARD">Hard (Omnidirectional)</option>
+      </select>
+    </div>
+    
+    <div class="game-status-metric">
+      <span class="metric-label">Status:</span>
+      <span class="metric-value" [class.complete]="remainingCount() === 0">
+        {{ remainingCount() === 0 ? 'Puzzle Solved!' : 'In Progress' }}
+      </span>
+    </div>
+  </div>
+
+  <div class="puzzle-matrix-wrapper">
+    @if (grid() && grid().length > 0) {
+      <div class="grid-board-container">
+        
+        @for (row of grid(); track rIdx; let rIdx = $index) {
+          <div class="grid-row-strip">
+            
+            @for (cell of row; track cIdx; let cIdx = $index) {
+              <div class="grid-cell"
+                  [class.highlighted]="isCellSelected(rIdx, cIdx)"
+                  [class.permanently-found]="isCellPermanentlyFound(rIdx, cIdx)"
+                  (mousedown)="onCellMouseDown(rIdx, cIdx)"
+                  (mouseenter)="onCellMouseEnter(rIdx, cIdx)">
+                {{ cell }}
+              </div>
+            }
+            
+          </div>
+        }
+
+      </div>
+    }
+  </div>
+</section>
+
+<aside class="workspace-sidebar-right">
+  <div class="checklist-header">
+    <h2>Target Words</h2>
+    <span class="badge-count">Remaining: {{ remainingCount() }}</span>
+  </div>
+  <div class="words-list-scrollview">
+    <ul>
+      @for (word of targetWords(); track word) {
+        <li [class.found]="foundWords().has(word)">
+          <span class="status-indicator"></span>
+          <span class="word-text-value">{{ word }}</span>
+        </li>
+      } @empty {
+        <li>Loading words...</li>
+      }
+    </ul>
+  </div>
+</aside>
