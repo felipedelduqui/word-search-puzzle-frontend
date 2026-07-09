@@ -1,7 +1,6 @@
 <aside class="workspace-sidebar-left">
   <h2>Select Topic</h2>
   <div class="topics-feed">
-    
     @for (topic of topics(); track topic.id) {
       <div class="topic-card" 
           [class.active]="selectedTopic() === topic.id"
@@ -17,19 +16,24 @@
         </div>
       </div>
     }
-    
   </div>
 </aside>
 
 <section class="workspace-arena">
   <div class="arena-controls-bar">
-    <div class="control-dropdown-group">
-      <label [attr.for]="'difficulty-selector'">Difficulty Level:</label>
-      <select id="difficulty-selector" [value]="selectedDifficulty()" (change)="changeDifficulty($event)">
-        <option value="EASY">Easy (Orthogonal)</option>
-        <option value="MEDIUM">Medium (Bidirectional)</option>
-        <option value="HARD">Hard (Omnidirectional)</option>
-      </select>
+    <div class="control-segment-group">
+      <span class="segment-label">Difficulty:</span>
+      <div class="buttons-segmented-control">
+        <button type="button" 
+                [class.active]="selectedDifficulty() === 'EASY'" 
+                (click)="selectDifficulty('EASY')">Easy</button>
+        <button type="button" 
+                [class.active]="selectedDifficulty() === 'MEDIUM'" 
+                (click)="selectDifficulty('MEDIUM')">Medium</button>
+        <button type="button" 
+                [class.active]="selectedDifficulty() === 'HARD'" 
+                (click)="selectDifficulty('HARD')">Hard</button>
+      </div>
     </div>
     
     <div class="game-status-metric">
@@ -43,10 +47,8 @@
   <div class="puzzle-matrix-wrapper">
     @if (grid() && grid().length > 0) {
       <div class="grid-board-container">
-        
         @for (row of grid(); track rIdx; let rIdx = $index) {
           <div class="grid-row-strip">
-            
             @for (cell of row; track cIdx; let cIdx = $index) {
               <div class="grid-cell"
                   [class.highlighted]="isCellSelected(rIdx, cIdx)"
@@ -56,12 +58,14 @@
                 {{ cell }}
               </div>
             }
-            
           </div>
         }
-
       </div>
     }
+  </div>
+
+  <div class="arena-footer-description">
+    <p>{{ difficultyDescription() }}</p>
   </div>
 </section>
 

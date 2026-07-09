@@ -1,17 +1,17 @@
 <div class="app-container">
-  
-  <header class="app-header">
-    <div class="header-branding" routerLink="/game">
-      <div class="logo-mark"></div>
-      <h1>WordCraft <span>Studio</span></h1>
+  <header class="main-header">
+    <div class="header-content">
+      <a routerLink="/" class="logo-click-wrapper">
+        <div class="header-nav">
+          <img src="logo4.PNG" alt="WordPuzzle Online Logo" />
+          <span>WordPuzzle <strong>Online</strong></span>
+        </div>
+      </a>
+      <a routerLink="/about" class="nav-link-about">About</a>
     </div>
-    <nav class="header-nav">
-      <a routerLink="/about" class="nav-link-about" routerLinkActive="active">About Me</a>
-    </nav>
   </header>
 
   <main class="app-workspace">
     <router-outlet></router-outlet>
   </main>
-
 </div>
