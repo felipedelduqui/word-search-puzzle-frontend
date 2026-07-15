@@ -6,4 +6,4 @@ import { Component } from '@angular/core';
   templateUrl: './theme-selection.html',
   styleUrl: './theme-selection.scss',
 })
-export class ThemeSelection {}
+export class ThemeSelectionComponent {}

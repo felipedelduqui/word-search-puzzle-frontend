@@ -1,0 +1,153 @@
+.privacy-container {
+  font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 50px 60px;
+  color: #374151;
+  background-color: #ffffff;
+  line-height: 1.7;
+  font-size: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f3f4f6;
+}
+
+/* Typography scale and hierarchy */
+.privacy-container h1 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.privacy-container h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-top: 48px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e5e7eb;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.privacy-container h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin-top: 32px;
+  margin-bottom: 12px;
+}
+
+/* Content spacing */
+.privacy-container p {
+  margin-bottom: 20px;
+}
+
+.privacy-container p:first-of-type {
+  color: #6b7280;
+  font-style: italic;
+  margin-bottom: 40px;
+}
+
+/* Enhanced lists */
+.privacy-container ul,
+.privacy-container ol {
+  margin-bottom: 28px;
+  padding-left: 24px;
+}
+
+.privacy-container li {
+  margin-bottom: 12px;
+}
+
+/* Highlighted links */
+.privacy-container a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  word-break: break-word;
+}
+
+.privacy-container a:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* Clean data tables */
+.privacy-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 32px 0;
+  font-size: 14px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.privacy-container th {
+  background-color: #f8fafc;
+  color: #334155;
+  font-weight: 600;
+  text-align: left;
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.privacy-container td {
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+  vertical-align: top;
+  color: #475569;
+}
+
+.privacy-container tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .privacy-container {
+    margin: 20px 16px;
+    padding: 30px 24px;
+  }
+}
+
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 24px;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .material-symbols-outlined {
+    font-size: 28px;
+    color: white;
+  }
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &:hover {
+    background-color: #1d4ed8;
+    transform: scale(1.1);
+  }
+}
