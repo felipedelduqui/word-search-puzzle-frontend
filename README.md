@@ -1,59 +1,53 @@
-# WordSearchPuzzleFrontend
+# WordSearch Online
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.12.
+An interactive, responsive word search puzzle web application built with Angular, designed to deliver a modern browser gaming experience with zero clutter.
 
-## Development server
+---
 
-To start a local development server, run:
+## Technical Stack & Architecture
 
-```bash
-ng serve
+The application is built using a modern Angular architecture, completely avoiding legacy NgModule structures in favor of standalone components, reactive signals, and explicit routing.
+
+* Frontend Framework: Angular (Standalone Components, Signals for reactive state management, Effects, and Computed properties).
+* Styling: SCSS with modular, component-scoped stylesheets, responsive CSS Grid layouts, and custom dynamic theme palettes.
+* Routing: Angular Router with lazy-loaded feature routes and query parameter passing (/ for Home selection, /game for the core puzzle workspace).
+* Audio & Interactivity: HTML5 Audio API for real-time sound feedback and custom pointer-event handling (mousedown, mouseenter, mouseup) for smooth matrix word selection.
+
+---
+
+## Project Structure & File Alignment
+
+The repository is organized following clean separation of concerns, dividing the codebase into modular pages, core shared logic, and routing configuration:
+
+```
+src/
+├── app/
+│   ├── core/
+│   │   ├── models/           # TypeScript interfaces and type definitions (puzzle, topic, difficulty)
+│   │   └── services/         # API integration and core business logic services
+│   ├── pages/
+│   │   ├── home/             # Landing page (Category sections, styled topic tiles, navigation triggers)
+│   │   ├── game-board/       # Core game container (Matrix rendering, mouse selection state, timer, score)
+│   │   ├── about/            # Static informational page
+│   │   └── policy pages/     # Privacy policy, terms of use, and cookie policy components
+│   ├── app.component.ts      # Root layout component containing global header and footer
+│   ├── app.config.ts         # Application configuration providers
+│   └── app.routes.ts         # Centralized lazy-loaded routing definitions
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Key Implementation Details
 
-## Code scaffolding
+1. Routing & Entry Flow: 
+   The application starts at the HomeComponent (/), where users choose a topic grouped by thematic categories (TV Series, Science, Heroes). Upon selection, the app navigates to the GameBoardComponent (/game?topic=...), passing the chosen topic via query parameters.
+2. Reactive State with Signals: 
+   Instead of traditional RxJS state for local component data, Angular Signals (signal, computed, effect) manage the puzzle matrix, selected difficulty, active target words, and completion status instantly.
+3. Responsive Grid Layout: 
+   The Home page utilizes CSS Grid with adaptive column scaling, ensuring proper alignment on wide desktop screens (leaving dedicated side margins for future ad slots) and responsive mobile viewports.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+---
 
-```bash
-ng generate component component-name
-```
+## Getting Started
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### Prerequisites
+* Node.js (v18+ recommended)
+* Angular CLI
