@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed, effect, HostListener } from '@angu
 import { CommonModule } from '@angular/common';
 import { PuzzleService } from '../../core/services/puzzle';
 import { Difficulty, TopicItem } from '../../core/models/puzzle.model';
+import { ThemeSelectionComponent } from '../theme-selection/theme-selection.component';
 
 interface CellCoords {
   row: number;
@@ -11,42 +12,50 @@ interface CellCoords {
 @Component({
   selector: 'app-game-board',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ThemeSelectionComponent],
   templateUrl: './game-board.html',
   styleUrl: './game-board.scss',
 })
 export class GameBoardComponent implements OnInit {
-  // Application State Management via Signals
   protected readonly title = signal('Word Search Puzzle');
   protected readonly topics = signal<TopicItem[]>([
-    { id: 'pokemon', name: 'Pokémon', imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/pokemon_card.PNG?t=123456789' },
-    { id: 'friends', name: 'Friends', imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/friends_card.PNG?t=123456789' },
-    { id: 'animals', name: 'Animals', imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'animals'     , name: 'Animals'     , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'biology'     , name: 'Biology'     , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'countries'   , name: 'Countries'   , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'dc'          , name: 'DC'          , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'dinosaurs'   , name: 'Dinosaurs'   , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'disney'      , name: 'Disney'      , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'dragon ball' , name: 'Dragon Ball' , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'harry potter', name: 'Harry Potter', imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'game of thrones', name: 'Game of Thrones', imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'history'     , name: 'History'     , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'marvel'      , name: 'Marvel'      , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'friends'     , name: 'Friends'     , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/friends_card.PNG?t=123456789' },
+    { id: 'how i met your mother', name: 'How I Met Your Mother', imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'naruto'      , name: 'Naruto'      , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'pokemon'     , name: 'Pokémon'     , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/pokemon_card.PNG?t=123456789' },
+    { id: 'scientists'  , name: 'Scientists'  , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'star wars'   , name: 'Star Wars'   , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
   ]);
 
   protected readonly selectedTopic = signal<string>('pokemon');
   protected readonly selectedDifficulty = signal<Difficulty>('EASY');
   
-  // Game Matrix and Words State
   protected readonly grid = signal<string[][]>([]);
   protected readonly targetWords = signal<string[]>([]);
   protected readonly foundWords = signal<Set<string>>(new Set());
   
-  // User Selection Interaction Tracking State
   protected readonly isSelecting = signal<boolean>(false);
   protected readonly selectionStart = signal<CellCoords | null>(null);
   protected readonly selectionCurrent = signal<CellCoords | null>(null);
 
-  // Audio assets instances for word success and ultimate match victory
   private readonly successAudio = new Audio('/audio/mixkit-electronic-lock-success-beeps-2852.wav');
   private readonly victoryAudio = new Audio('/audio/mixkit-fantasy-game-success-notification-270.wav');
 
-  // Computes the words remaining to find dynamically
   protected readonly remainingCount = computed(() => {
     return this.targetWords().length - this.foundWords().size;
   });
 
-  // Dynamic evaluation pipeline mapping for specific mode rules descriptions
   protected readonly difficultyDescription = computed(() => {
     const descriptions: Record<Difficulty, string> = {
       EASY: 'Easy Mode: Words are hidden orthogonally (left to right, or top to bottom).',
@@ -57,7 +66,6 @@ export class GameBoardComponent implements OnInit {
   });
 
   constructor(private puzzleService: PuzzleService) {
-    // Automatically re-fetch data whenever configuration triggers change
     effect(() => {
       this.loadNewPuzzle(this.selectedTopic(), this.selectedDifficulty());
     });
@@ -91,8 +99,6 @@ export class GameBoardComponent implements OnInit {
   protected selectDifficulty(difficulty: Difficulty): void {
     this.selectedDifficulty.set(difficulty);
   }
-
-  // --- Interaction Mechanics Matrix Event Handlers ---
 
   protected onCellMouseDown(row: number, col: number): void {
     this.isSelecting.set(true);

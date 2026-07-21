@@ -1,1 +1,14 @@
-<p>theme-selection works!</p>
+<aside class="workspace-sidebar-left">
+  <h2>Select Topic</h2>
+  <div class="topics-feed">
+    @for (topic of topics(); track topic.id) {
+      <div class="topic-card" 
+          [class.active]="selectedTopic() === topic.id"
+          (click)="selectTopic(topic.id)">
+        <div class="card-info">
+          <h3>{{ topic.name }}</h3>
+        </div>
+      </div>
+    }
+  </div>
+</aside>

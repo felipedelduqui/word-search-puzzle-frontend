@@ -1,23 +1,8 @@
-<aside class="workspace-sidebar-left">
-  <h2>Select Topic</h2>
-  <div class="topics-feed">
-    @for (topic of topics(); track topic.id) {
-      <div class="topic-card" 
-          [class.active]="selectedTopic() === topic.id"
-          (click)="selectTopic(topic.id)">
-        <div class="card-image-wrapper">
-          <img #imgRef 
-              [src]="topic.imageUrl" 
-              [alt]="topic.name"
-              (error)="imgRef.src = 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG'" />
-        </div>
-        <div class="card-info">
-          <h3>{{ topic.name }}</h3>
-        </div>
-      </div>
-    }
-  </div>
-</aside>
+<app-theme-selection
+  [topics]="topics()"
+  [selectedTopic]="selectedTopic()"
+  (topicSelected)="selectTopic($event)"
+/>
 
 <section class="workspace-arena">
   <div class="arena-controls-bar">
