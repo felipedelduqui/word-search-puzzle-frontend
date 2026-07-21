@@ -4,8 +4,8 @@ import { Component, HostListener } from '@angular/core';
   selector: 'app-cookie-policy',
   standalone: true,
   imports: [],
-  templateUrl: './cookie-policy.html',
-  styleUrls: ['./cookie-policy.scss']
+  templateUrl: './cookie-policy.component.html',
+  styleUrls: ['./cookie-policy.component.scss']
 })
 export class CookiePolicyComponent {
   isScrolled = false;

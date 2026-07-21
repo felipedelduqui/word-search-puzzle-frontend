@@ -1,0 +1,21 @@
+<div class="home-wrapper">
+  <header class="home-header">
+    <p>Select a category below to test your focus and vocabulary.</p>
+  </header>
+
+  <div class="categories-container">
+    @for (section of sections(); track section.title) {
+      <section class="category-group" [class]="section.themeClass">
+        <h2>{{ section.title }}</h2>
+        <div class="topics-grid">
+          @for (topic of section.topics; track topic.id) {
+            <button type="button" class="topic-tile" (click)="selectTopic(topic.id)">
+              <span class="tile-name">{{ topic.name }}</span>
+              <span class="tile-action">Play &rarr;</span>
+            </button>
+          }
+        </div>
+      </section>
+    }
+  </div>
+</div>

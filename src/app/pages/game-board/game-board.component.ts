@@ -13,8 +13,8 @@ interface CellCoords {
   selector: 'app-game-board',
   standalone: true,
   imports: [CommonModule, ThemeSelectionComponent],
-  templateUrl: './game-board.html',
-  styleUrl: './game-board.scss',
+  templateUrl: './game-board.component.html',
+  styleUrl: './game-board.component.scss',
 })
 export class GameBoardComponent implements OnInit {
   protected readonly title = signal('Word Search Puzzle');

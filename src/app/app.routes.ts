@@ -1,7 +1,10 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'game', pathMatch: 'full' },
+  { 
+    path: '', 
+    loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) 
+  },
   { 
     path: 'game', 
     loadComponent: () => import('./pages/game-board/game-board.component').then(m => m.GameBoardComponent) 
@@ -22,5 +25,5 @@ export const routes: Routes = [
     path: 'cookie-policy', 
     loadComponent: () => import('./pages/cookie-policy/cookie-policy.component').then(m => m.CookiePolicyComponent) 
   },
-  { path: '**', redirectTo: 'game' }
+  { path: '**', redirectTo: '' }
 ];

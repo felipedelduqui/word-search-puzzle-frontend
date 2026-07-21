@@ -6,15 +6,12 @@ import { TopicItem } from '../../core/models/puzzle.model';
   selector: 'app-theme-selection',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './theme-selection.html',
-  styleUrl: './theme-selection.scss',
+  templateUrl: './theme-selection.component.html',
+  styleUrl: './theme-selection.component.scss',
 })
 export class ThemeSelectionComponent {
-  // Inputs vindos do componente pai
   readonly topics = input.required<TopicItem[]>();
   readonly selectedTopic = input.required<string>();
-
-  // Evento emitido para notificar o pai quando um tópico for selecionado
   readonly topicSelected = output<string>();
 
   protected selectTopic(topicId: string): void {

@@ -5,8 +5,8 @@ import { RouterLink} from '@angular/router';
   selector: 'app-privacy-policy',
   standalone: true,
   imports: [RouterLink],
-  templateUrl: './privacy-policy.html',
-  styleUrls: ['./privacy-policy.scss']
+  templateUrl: './privacy-policy.component.html',
+  styleUrls: ['./privacy-policy.component.scss']
 })
 export class PrivacyPolicyComponent {
   isScrolled = false;
