@@ -1,5 +1,6 @@
 import { Component, OnInit, signal, computed, effect, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { PuzzleService } from '../../core/services/puzzle';
 import { Difficulty, TopicItem } from '../../core/models/puzzle.model';
 import { ThemeSelectionComponent } from '../theme-selection/theme-selection.component';
@@ -19,23 +20,23 @@ interface CellCoords {
 export class GameBoardComponent implements OnInit {
   protected readonly title = signal('Word Search Puzzle');
   protected readonly topics = signal<TopicItem[]>([
-    { id: 'animals'     , name: 'Animals'     , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
-    { id: 'biology'     , name: 'Biology'     , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
-    { id: 'countries'   , name: 'Countries'   , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
-    { id: 'dc'          , name: 'DC'          , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
-    { id: 'dinosaurs'   , name: 'Dinosaurs'   , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
-    { id: 'disney'      , name: 'Disney'      , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
-    { id: 'dragon ball' , name: 'Dragon Ball' , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
-    { id: 'harry potter', name: 'Harry Potter', imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
-    { id: 'game of thrones', name: 'Game of Thrones', imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
-    { id: 'history'     , name: 'History'     , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
-    { id: 'marvel'      , name: 'Marvel'      , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
-    { id: 'friends'     , name: 'Friends'     , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/friends_card.PNG?t=123456789' },
-    { id: 'how i met your mother', name: 'How I Met Your Mother', imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
-    { id: 'naruto'      , name: 'Naruto'      , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
-    { id: 'pokemon'     , name: 'Pokémon'     , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/pokemon_card.PNG?t=123456789' },
-    { id: 'scientists'  , name: 'Scientists'  , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
-    { id: 'star wars'   , name: 'Star Wars'   , imageUrl: 'https://vofoegntfdlyoqiloqwz.supabase.co/storage/v1/object/public/puzzle-images/default_card.PNG?t=123456789' },
+    { id: 'animals'        , name: 'Animals'     },
+    { id: 'biology'        , name: 'Biology'     },
+    { id: 'countries'      , name: 'Countries'   },
+    { id: 'dc'             , name: 'DC'          },
+    { id: 'dinosaurs'      , name: 'Dinosaurs'   },
+    { id: 'disney'         , name: 'Disney'      },
+    { id: 'dragon ball'    , name: 'Dragon Ball' },
+    { id: 'harry potter'   , name: 'Harry Potter'},
+    { id: 'game of thrones', name: 'Game of Thrones'},
+    { id: 'history'        , name: 'History'     },
+    { id: 'marvel'         , name: 'Marvel'      },
+    { id: 'friends'        , name: 'Friends'     },
+    { id: 'how i met your mother', name: 'How I Met Your Mother'},
+    { id: 'naruto'         , name: 'Naruto'      },
+    { id: 'pokemon'        , name: 'Pokémon'     },
+    { id: 'scientists'     , name: 'Scientists'  },
+    { id: 'star wars'      , name: 'Star Wars'   },
   ]);
 
   protected readonly selectedTopic = signal<string>('pokemon');
@@ -65,13 +66,23 @@ export class GameBoardComponent implements OnInit {
     return descriptions[this.selectedDifficulty()];
   });
 
-  constructor(private puzzleService: PuzzleService) {
+  constructor(
+    private puzzleService: PuzzleService,
+    private route: ActivatedRoute
+  ) {
     effect(() => {
       this.loadNewPuzzle(this.selectedTopic(), this.selectedDifficulty());
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Captura o parâmetro de query passado pela Home (ex: ?topic=marvel)
+    this.route.queryParams.subscribe(params => {
+      if (params['topic']) {
+        this.selectedTopic.set(params['topic']);
+      }
+    });
+  }
 
   @HostListener('window:mouseup')
   protected onMouseUp(): void {

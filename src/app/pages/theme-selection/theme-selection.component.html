@@ -1,12 +1,15 @@
-<aside class="workspace-sidebar-left">
-  <h2>Select Topic</h2>
-  <div class="topics-feed">
+<aside class="bg-white rounded-xl border border-slate-200 p-4 flex flex-col gap-3.5 h-fit shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)]">
+  <h2 class="text-indigo-500 font-bold m-0">Select Topic</h2>
+  <div class="flex flex-col gap-2">
     @for (topic of topics(); track topic.id) {
-      <div class="topic-card" 
-          [class.active]="selectedTopic() === topic.id"
-          (click)="selectTopic(topic.id)">
-        <div class="card-info">
-          <h3>{{ topic.name }}</h3>
+      <div class="bg-slate-50 rounded-lg border-1.5 overflow-hidden cursor-pointer flex flex-row items-center p-1.5 gap-2.5 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] select-none [-webkit-user-select:none] hover:-translate-y-px hover:border-slate-200 hover:bg-slate-100"
+           [class.border-indigo-500]="selectedTopic() === topic.id"
+           [class.bg-white]="selectedTopic() === topic.id"
+           [class.shadow-[0_0_0_1px_#6366f1,_0_4px_10px_rgba(99,102,241,0.1)]]="selectedTopic() === topic.id"
+           [class.border-transparent]="selectedTopic() !== topic.id"
+           (click)="selectTopic(topic.id)">
+        <div class="p-0 flex-1 min-w-0">
+          <h3 class="m-0 text-xs font-semibold text-slate-900 text-left whitespace-nowrap overflow-hidden text-ellipsis">{{ topic.name }}</h3>
         </div>
       </div>
     }

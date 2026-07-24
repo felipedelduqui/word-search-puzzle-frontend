@@ -8,5 +8,4 @@ export interface WordSearchResponse {
 export interface TopicItem {
   id: string;
   name: string;
-  imageUrl: string;
 }

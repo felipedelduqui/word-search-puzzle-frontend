@@ -1,21 +1,36 @@
-<div class="home-wrapper">
-  <header class="home-header">
-    <p>Select a category below to test your focus and vocabulary.</p>
+<div class="max-w-[1400px] mx-auto px-12 max-[900px]:px-6 py-10 flex flex-col gap-10">
+  <header class="text-center animate-fade-in-down">
+    <p class="text-[1.15rem] font-medium text-slate-500 m-0">Select a category below to test your focus and vocabulary.</p>
   </header>
 
-  <div class="categories-container">
-    @for (section of sections(); track section.title) {
-      <section class="category-group" [class]="section.themeClass">
-        <h2>{{ section.title }}</h2>
-        <div class="topics-grid">
-          @for (topic of section.topics; track topic.id) {
-            <button type="button" class="topic-tile" (click)="selectTopic(topic.id)">
-              <span class="tile-name">{{ topic.name }}</span>
-              <span class="tile-action">Play &rarr;</span>
-            </button>
-          }
+  <div class="grid grid-cols-3 max-[1024px]:grid-cols-1 gap-8">
+    @for (section of sections(); track section.title; let idx = $index) {
+      <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-[0_10px_25px_-5px_rgba(0,0,0,0.05)] flex flex-col justify-between animate-fade-in-down opacity-0"
+               [style.animation-delay]="(idx * 150) + 'ms'">
+        
+        <div class="w-full h-48 overflow-hidden bg-slate-100 border-b border-slate-200">
+          <img [src]="section.imageUrl" [alt]="section.title" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
         </div>
-      </section>
+
+        <div class="p-6 flex flex-col gap-5 flex-1 justify-between">
+          <div>
+            <h2 class="text-xl font-extrabold text-slate-900 m-0 mb-2 tracking-[-0.01em]">{{ section.title }}</h2>
+            <p class="text-slate-500 text-[0.925rem] leading-[1.5] m-0">{{ section.description }}</p>
+          </div>
+
+          <div class="flex flex-col gap-2.5 pt-4 border-t border-slate-100">
+            @for (topic of section.topics; track topic.id) {
+              <button type="button" 
+                      class="topic-tile bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-indigo-400 rounded-xl px-4 py-3 flex justify-between items-center cursor-pointer transition-all duration-200 text-left w-full group" 
+                      (click)="selectTopic(topic.id)">
+                <span class="text-[0.95rem] font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">{{ topic.name }}</span>
+                <span class="text-xs font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">Play &rarr;</span>
+              </button>
+            }
+          </div>
+        </div>
+
+      </article>
     }
   </div>
 </div>
